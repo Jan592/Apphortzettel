@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Icon Vorschau - Hortzettel App</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    h1 {
+      color: white;
+      text-align: center;
+      margin-bottom: 40px;
+      font-size: 2.5rem;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+    
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+    
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      text-align: center;
+    }
+    
+    .card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+      color: #333;
+    }
+    
+    .card p {
+      color: #666;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+    }
+    
+    .icon-display {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 20px 0;
+      min-height: 200px;
+    }
+    
+    .icon-display img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .size-label {
+      display: inline-block;
+      background: #3B82F6;
+      color: white;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      margin-top: 10px;
+    }
+    
+    .preview-sizes {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      margin-bottom: 40px;
+    }
+    
+    .preview-sizes h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #333;
+    }
+    
+    .size-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 20px;
+      align-items: end;
+    }
+    
+    .size-item {
+      text-align: center;
+    }
+    
+    .size-item img {
+      display: block;
+      margin: 0 auto 10px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .size-item span {
+      display: block;
+      color: #666;
+      font-size: 0.85rem;
+    }
+    
+    .info-box {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    
+    .info-box h3 {
+      margin-bottom: 15px;
+      font-size: 1.5rem;
+    }
+    
+    .info-box p {
+      opacity: 0.9;
+      line-height: 1.6;
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .btn {
+      display: inline-block;
+      padding: 12px 24px;
+      background: white;
+      color: #667eea;
+      text-decoration: none;
+      border-radius: 10px;
+      font-weight: 600;
+      transition: transform 0.2s;
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎨 Hortzettel App - Icon Vorschau</h1>
+    
+    <!-- Main Icons -->
+    <div class="grid">
+      <!-- Classic Design -->
+      <div class="card">
+        <h2>🎓 Classic Design</h2>
+        <p>Traditionelles Schul-Design mit Doktorhut und Stift</p>
+        <div class="icon-display">
+          <img src="/app-icon.svg" alt="Classic Icon" style="width: 200px; height: 200px;">
+        </div>
+        <span class="size-label">app-icon.svg</span>
+      </div>
+      
+      <!-- Modern Design -->
+      <div class="card">
+        <h2>✨ Modern Design</h2>
+        <p>Modernes Clipboard-Design mit Checkboxen</p>
+        <div class="icon-display">
+          <img src="/app-icon-modern.svg" alt="Modern Icon" style="width: 200px; height: 200px;">
+        </div>
+        <span class="size-label">app-icon-modern.svg</span>
+      </div>
+      
+      <!-- Favicon -->
+      <div class="card">
+        <h2>🔍 Favicon</h2>
+        <p>Vereinfachte Version für Browser-Tabs</p>
+        <div class="icon-display">
+          <img src="/favicon.svg" alt="Favicon" style="width: 64px; height: 64px;">
+        </div>
+        <span class="size-label">favicon.svg</span>
+      </div>
+    </div>
+    
+    <!-- Size Comparison -->
+    <div class="preview-sizes">
+      <h2>📐 Größenvergleich</h2>
+      <div class="size-grid">
+        <div class="size-item">
+          <img src="/app-icon-modern.svg" style="width: 16px; height: 16px;" alt="16x16">
+          <span>16x16 px</span>
+          <span>Browser Tab</span>
+        </div>
+        <div class="size-item">
+          <img src="/app-icon-modern.svg" style="width: 32px; height: 32px;" alt="32x32">
+          <span>32x32 px</span>
+          <span>Retina Tab</span>
+        </div>
+        <div class="size-item">
+          <img src="/app-icon-modern.svg" style="width: 64px; height: 64px;" alt="64x64">
+          <span>64x64 px</span>
+          <span>Desktop</span>
+        </div>
+        <div class="size-item">
+          <img src="/app-icon-modern.svg" style="width: 128px; height: 128px;" alt="128x128">
+          <span>128x128 px</span>
+          <span>Homescreen</span>
+        </div>
+        <div class="size-item">
+          <img src="/app-icon-modern.svg" style="width: 192px; height: 192px;" alt="192x192">
+          <span>192x192 px</span>
+          <span>Android</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Background Tests -->
+    <div class="grid">
+      <div class="card" style="background: #ffffff;">
+        <h2>Heller Hintergrund</h2>
+        <div class="icon-display">
+          <img src="/app-icon-modern.svg" alt="Light BG" style="width: 150px; height: 150px;">
+        </div>
+      </div>
+      
+      <div class="card" style="background: #1a1a1a;">
+        <h2 style="color: white;">Dunkler Hintergrund</h2>
+        <div class="icon-display">
+          <img src="/app-icon-modern.svg" alt="Dark BG" style="width: 150px; height: 150px;">
+        </div>
+      </div>
+      
+      <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <h2 style="color: white;">Gradient Hintergrund</h2>
+        <div class="icon-display">
+          <img src="/app-icon-modern.svg" alt="Gradient BG" style="width: 150px; height: 150px;">
+        </div>
+      </div>
+    </div>
+    
+    <!-- Info -->
+    <div class="info-box">
+      <h3>📱 Installation</h3>
+      <p>So installieren Sie die App auf Ihrem Smartphone mit diesem Icon:</p>
+      <div class="button-group">
+        <a href="/APP_ICON_SETUP.md" class="btn">📖 Setup-Anleitung</a>
+        <a href="/ICON_PREVIEW.md" class="btn">🎨 Design-Details</a>
+        <a href="/" class="btn">🏠 Zur App</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

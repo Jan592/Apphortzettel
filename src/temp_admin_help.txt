@@ -1,0 +1,30 @@
+// State ergänzen nach Zeile 78:
+const [showHelpDialog, setShowHelpDialog] = useState(false);
+
+// Button im Header einfügen nach Zeile 339:
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={() => setShowHelpDialog(true)}
+                variant="secondary"
+                className="bg-white/20 hover:bg-white/30 text-white border-white/30"
+              >
+                <HelpCircle className="h-4 w-4 mr-2" />
+                <span className="hidden md:inline">Hilfe</span>
+              </Button>
+              <Button
+                onClick={() => setShowDeveloperMode(true)}
+                variant="secondary"
+                className="bg-white/20 hover:bg-white/30 text-white border-white/30"
+              >
+                <Code className="h-4 w-4 mr-2" />
+                <span className="hidden md:inline">Developer</span>
+              </Button>
+              <Button
+                onClick={onLogout}
+                variant="secondary"
+                className="bg-white/20 hover:bg-white/30 text-white border-white/30"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                <span className="hidden md:inline">Abmelden</span>
+              </Button>
+            </div>

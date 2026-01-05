@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PWA Debug - Hortzettel App</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .check-item {
+            background: #f8f9fa;
+            border-left: 4px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        .check-item.success {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+        .check-item.warning {
+            background: #fff3cd;
+            border-color: #ffc107;
+        }
+        .check-item.error {
+            background: #f8d7da;
+            border-color: #dc3545;
+        }
+        .check-item h3 {
+            margin-bottom: 5px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .check-item p {
+            color: #666;
+            font-size: 14px;
+            margin: 5px 0;
+        }
+        .check-item code {
+            background: rgba(0,0,0,0.1);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 13px;
+        }
+        .icon {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            text-align: center;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        .info-box {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .info-box h3 {
+            color: #004085;
+            margin-bottom: 10px;
+        }
+        .info-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        .info-box li {
+            padding: 5px 0;
+            color: #004085;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 12px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 PWA Debug Tool</h1>
+        <p class="subtitle">Überprüfen Sie, ob Ihre App alle PWA-Anforderungen erfüllt</p>
+
+        <div style="margin-bottom: 20px;">
+            <button onclick="runChecks()">🔄 Prüfung starten</button>
+            <button onclick="window.location.href='/'">← Zurück zur App</button>
+            <button onclick="window.location.href='/create-icons.html'">🎨 Icons erstellen</button>
+        </div>
+
+        <div id="results"></div>
+
+        <div class="info-box">
+            <h3>💡 Tipps zur Fehlerbehebung</h3>
+            <ul>
+                <li>✅ HTTPS ist erforderlich (außer auf localhost)</li>
+                <li>✅ Service Worker muss registriert sein</li>
+                <li>✅ manifest.json muss gültig sein</li>
+                <li>✅ Mindestens ein 192x192 und ein 512x512 Icon</li>
+                <li>✅ App muss auf einem Webserver gehostet werden</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        async function runChecks() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<p>Prüfung läuft...</p>';
+
+            const checks = [];
+
+            // 1. Check HTTPS
+            const isSecure = location.protocol === 'https:' || location.hostname === 'localhost';
+            checks.push({
+                name: 'HTTPS/Secure Context',
+                status: isSecure ? 'success' : 'error',
+                message: isSecure 
+                    ? `✅ Verbindung ist sicher (${location.protocol})`
+                    : '❌ HTTPS erforderlich! PWA funktioniert nur über HTTPS.',
+                details: `Protocol: ${location.protocol}, Host: ${location.hostname}`
+            });
+
+            // 2. Check Service Worker Support
+            const swSupported = 'serviceWorker' in navigator;
+            checks.push({
+                name: 'Service Worker Support',
+                status: swSupported ? 'success' : 'error',
+                message: swSupported 
+                    ? '✅ Service Worker wird unterstützt'
+                    : '❌ Service Worker wird nicht unterstützt',
+                details: swSupported ? 'navigator.serviceWorker ist verfügbar' : 'Browser unterstützt keine Service Worker'
+            });
+
+            // 3. Check Service Worker Registration
+            let swRegistered = false;
+            let swActive = false;
+            if (swSupported) {
+                try {
+                    const registration = await navigator.serviceWorker.getRegistration();
+                    swRegistered = !!registration;
+                    swActive = registration && registration.active;
+                    checks.push({
+                        name: 'Service Worker Registration',
+                        status: swActive ? 'success' : (swRegistered ? 'warning' : 'error'),
+                        message: swActive 
+                            ? '✅ Service Worker ist registriert und aktiv'
+                            : swRegistered 
+                                ? '⚠️ Service Worker registriert aber nicht aktiv'
+                                : '❌ Service Worker nicht registriert',
+                        details: registration ? `Scope: ${registration.scope}` : 'Keine Registrierung gefunden'
+                    });
+                } catch (e) {
+                    checks.push({
+                        name: 'Service Worker Registration',
+                        status: 'error',
+                        message: '❌ Fehler beim Prüfen des Service Workers',
+                        details: e.message
+                    });
+                }
+            }
+
+            // 4. Check Manifest
+            let manifestValid = false;
+            try {
+                const manifestResponse = await fetch('/manifest.json');
+                const manifest = await manifestResponse.json();
+                manifestValid = manifestResponse.ok;
+                
+                const hasName = !!(manifest.name || manifest.short_name);
+                const hasStartUrl = !!manifest.start_url;
+                const hasDisplay = !!manifest.display;
+                const hasIcons = manifest.icons && manifest.icons.length > 0;
+
+                checks.push({
+                    name: 'Web App Manifest',
+                    status: manifestValid && hasName && hasStartUrl && hasDisplay && hasIcons ? 'success' : 'warning',
+                    message: manifestValid 
+                        ? `✅ Manifest gefunden und gültig`
+                        : '❌ Manifest nicht gefunden oder ungültig',
+                    details: `Name: ${hasName ? '✅' : '❌'} | Start URL: ${hasStartUrl ? '✅' : '❌'} | Display: ${hasDisplay ? '✅' : '❌'} | Icons: ${hasIcons ? manifest.icons.length : '❌'}`
+                });
+
+                if (hasIcons) {
+                    const iconSizes = manifest.icons.map(i => i.sizes).join(', ');
+                    checks.push({
+                        name: 'App Icons',
+                        status: 'success',
+                        message: `✅ ${manifest.icons.length} Icon(s) definiert`,
+                        details: `Größen: ${iconSizes}`
+                    });
+
+                    // Check if icons actually exist
+                    for (const icon of manifest.icons) {
+                        try {
+                            const iconResponse = await fetch(icon.src);
+                            checks.push({
+                                name: `Icon: ${icon.sizes}`,
+                                status: iconResponse.ok ? 'success' : 'error',
+                                message: iconResponse.ok 
+                                    ? `✅ Icon vorhanden (${icon.sizes})`
+                                    : `❌ Icon nicht gefunden (${icon.sizes})`,
+                                details: `Pfad: ${icon.src} | Type: ${icon.type}`
+                            });
+                        } catch (e) {
+                            checks.push({
+                                name: `Icon: ${icon.sizes}`,
+                                status: 'error',
+                                message: `❌ Fehler beim Laden (${icon.sizes})`,
+                                details: e.message
+                            });
+                        }
+                    }
+                }
+            } catch (e) {
+                checks.push({
+                    name: 'Web App Manifest',
+                    status: 'error',
+                    message: '❌ Fehler beim Laden des Manifests',
+                    details: e.message
+                });
+            }
+
+            // 5. Check beforeinstallprompt
+            checks.push({
+                name: 'Install Prompt',
+                status: 'warning',
+                message: '⏳ beforeinstallprompt Event wird überwacht',
+                details: 'Event wird nur ausgelöst, wenn alle Anforderungen erfüllt sind'
+            });
+
+            // 6. Check if already installed
+            const isInstalled = window.matchMedia('(display-mode: standalone)').matches ||
+                               window.navigator.standalone ||
+                               document.referrer.includes('android-app://');
+            
+            checks.push({
+                name: 'Installation Status',
+                status: isInstalled ? 'success' : 'warning',
+                message: isInstalled 
+                    ? '✅ App ist bereits installiert (läuft im Standalone-Modus)'
+                    : '⏳ App ist noch nicht installiert',
+                details: isInstalled ? 'display-mode: standalone' : 'display-mode: browser'
+            });
+
+            // 7. Browser Info
+            const ua = navigator.userAgent;
+            let browserName = 'Unbekannt';
+            if (ua.includes('Chrome')) browserName = 'Chrome';
+            else if (ua.includes('Safari')) browserName = 'Safari';
+            else if (ua.includes('Firefox')) browserName = 'Firefox';
+            else if (ua.includes('Edge')) browserName = 'Edge';
+
+            const isIOS = /iPad|iPhone|iPod/.test(ua);
+            const isAndroid = /Android/.test(ua);
+            const isMobile = isIOS || isAndroid;
+
+            checks.push({
+                name: 'Browser & Plattform',
+                status: 'success',
+                message: `ℹ️ ${browserName} auf ${isIOS ? 'iOS' : isAndroid ? 'Android' : 'Desktop'}`,
+                details: isMobile ? (isIOS ? 'iOS unterstützt PWA nur in Safari!' : 'Android unterstützt PWA gut!') : 'Desktop-Browser'
+            });
+
+            // Render results
+            results.innerHTML = checks.map(check => `
+                <div class="check-item ${check.status}">
+                    <h3>
+                        <span class="icon">${check.status === 'success' ? '✅' : check.status === 'warning' ? '⚠️' : '❌'}</span>
+                        ${check.name}
+                    </h3>
+                    <p><strong>${check.message}</strong></p>
+                    <p><code>${check.details}</code></p>
+                </div>
+            `).join('');
+
+            // Summary
+            const successCount = checks.filter(c => c.status === 'success').length;
+            const totalCount = checks.length;
+            const percentage = Math.round((successCount / totalCount) * 100);
+
+            results.innerHTML += `
+                <div class="info-box" style="margin-top: 20px;">
+                    <h3>📊 Zusammenfassung</h3>
+                    <p style="font-size: 18px; color: #004085;">
+                        <strong>${successCount} von ${totalCount}</strong> Checks bestanden (${percentage}%)
+                    </p>
+                    ${percentage === 100 
+                        ? '<p style="color: #28a745;">🎉 Perfekt! Ihre App erfüllt alle PWA-Anforderungen!</p>'
+                        : percentage >= 70
+                            ? '<p style="color: #ffc107;">⚠️ Fast fertig! Beheben Sie die verbleibenden Probleme.</p>'
+                            : '<p style="color: #dc3545;">❌ Mehrere Probleme gefunden. Bitte beheben Sie diese.</p>'
+                    }
+                </div>
+            `;
+        }
+
+        // Auto-run on load
+        window.addEventListener('load', runChecks);
+    </script>
+</body>
+</html>
