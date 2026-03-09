@@ -37,7 +37,7 @@ export default function AdminLogin({ onSuccess, onBack }: AdminLoginProps) {
       console.error("Admin login error:", error);
       
       // If credentials are invalid, suggest setup
-      if (error.message.includes('Ungültige Anmeldedaten') || error.message.includes('Invalid login credentials')) {
+      if (error?.message?.includes('Ungültige Anmeldedaten') || error?.message?.includes('Invalid login credentials')) {
         toast.error("Ungültige Anmeldedaten. Wurde das Admin-Konto bereits erstellt?");
       } else {
         toast.error(error.message || "Anmeldung fehlgeschlagen");

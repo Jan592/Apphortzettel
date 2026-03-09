@@ -11,6 +11,7 @@ const schoolImage = "https://images.unsplash.com/photo-1665270695165-93b5798522a
 
 interface HortnerLoginProps {
   onLogin: (klasse: string, password: string) => Promise<void>;
+  schoolPhotoUrl?: string;
 }
 
 // Hardcodierte Zugangsdaten für Hortner/innen
@@ -21,12 +22,14 @@ const HORTNER_CREDENTIALS = {
   "hort-4": { password: "Hort2024_K4", label: "Hort 4" },
 };
 
-function HortnerLogin({ onLogin }: HortnerLoginProps) {
+export function HortnerLogin({ onLogin, schoolPhotoUrl }: HortnerLoginProps) {
   const [selectedKlasse, setSelectedKlasse] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+
+  const displaySchoolImage = schoolPhotoUrl || schoolImage;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,7 +70,7 @@ function HortnerLogin({ onLogin }: HortnerLoginProps) {
       <div className="absolute inset-0">
         <div 
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${schoolImage})` }}
+          style={{ backgroundImage: `url(${displaySchoolImage})` }}
         />
         <div className="absolute inset-0 bg-gradient-to-br from-orange-900/95 via-amber-900/90 to-red-900/95 backdrop-blur-sm" />
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDE0YzMuMzEgMCA2IDIuNjkgNiA2cy0yLjY5IDYtNiA2LTYtMi42OS02LTYgMi42OS02IDYtNiIvPjwvZz48L2c+PC9zdmc+')] opacity-40"></div>

@@ -6,12 +6,14 @@ interface SplashScreenProps {
   onComplete: () => void;
   schoolName?: string;
   appTitle?: string;
+  schoolPhotoUrl?: string;
 }
 
 export default function SplashScreen({ 
   onComplete, 
   schoolName = "Grundschule Auma",
-  appTitle = "Hortzettel App"
+  appTitle = "Hortzettel App",
+  schoolPhotoUrl
 }: SplashScreenProps) {
 
   return (
@@ -87,7 +89,7 @@ export default function SplashScreen({
               {/* Image container */}
               <div className="relative w-80 h-80 rounded-3xl overflow-hidden shadow-2xl ring-4 ring-white/40">
                 <img
-                  src={schoolImage}
+                  src={schoolPhotoUrl || schoolImage}
                   alt={schoolName}
                   className="w-full h-full object-cover"
                 />

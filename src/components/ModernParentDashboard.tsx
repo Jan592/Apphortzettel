@@ -36,6 +36,7 @@ interface ModernParentDashboardProps {
   schoolName: string;
   content?: any;
   onToggleDesign?: (useModern: boolean) => void;
+  schoolPhotoUrl?: string;
 }
 
 export default function ModernParentDashboard({
@@ -49,7 +50,8 @@ export default function ModernParentDashboard({
   onViewAllHortzettel,
   schoolName,
   content = {},
-  onToggleDesign
+  onToggleDesign,
+  schoolPhotoUrl: externalSchoolPhotoUrl
 }: ModernParentDashboardProps) {
   const [currentTab, setCurrentTab] = useState<'home' | 'hortzettel' | 'support' | 'profile'>('home');
   const [hortzettel, setHortzettel] = useState(initialHortzettel);
@@ -60,7 +62,7 @@ export default function ModernParentDashboard({
   const [messages, setMessages] = useState<Message[]>([]);
   const [showHelpDialog, setShowHelpDialog] = useState(false);
   const [isEditingAllowedState, setIsEditingAllowedState] = useState(true);
-  const [schoolPhotoUrl, setSchoolPhotoUrl] = useState<string>("https://images.unsplash.com/photo-1665270695165-93b5798522ad?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxnZXJtYW4lMjBlbGVtZW50YXJ5JTIwc2Nob29sJTIwYnVpbGRpbmd8ZW58MXx8fHwxNzYyODU4MzU5fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral");
+  const [schoolPhotoUrl, setSchoolPhotoUrl] = useState<string>(externalSchoolPhotoUrl || "https://images.unsplash.com/photo-1665270695165-93b5798522ad?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxnZXJtYW4lMjBlbGVtZW50YXJ5JTIwc2Nob29sJTIwYnVpbGRpbmd8ZW58MXx8fHwxNzYyODU4MzU5fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral");
   const [timeRestrictions, setTimeRestrictions] = useState<TimeRestrictionSettings>({
     enabled: false,
     blockStartHour: 15,

@@ -44,6 +44,35 @@ function validatePassword(password: string): { valid: boolean; error?: string } 
   return { valid: true };
 }
 
+// Helper to generate a valid email from names
+function generateEmailFromName(firstName: string, lastName: string): string {
+  // Replace umlauts and special characters
+  const replaceUmlauts = (str: string) => {
+    return str
+      .replace(/ä/g, 'ae')
+      .replace(/ö/g, 'oe')
+      .replace(/ü/g, 'ue')
+      .replace(/ß/g, 'ss')
+      .replace(/Ä/g, 'Ae')
+      .replace(/Ö/g, 'Oe')
+      .replace(/Ü/g, 'Ue');
+  };
+
+  const cleanFirstName = replaceUmlauts(firstName)
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, ''); // Remove all non-alphanumeric chars (including spaces, dashes)
+  
+  const cleanLastName = replaceUmlauts(lastName)
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '');
+
+  // Fallback if empty
+  const finalFirst = cleanFirstName || 'user';
+  const finalLast = cleanLastName || Date.now().toString().slice(-4);
+
+  return `${finalFirst}.${finalLast}@hort-auma.de`;
+}
+
 // Week number calculation (ISO week)
 function getWeekNumber(date: Date = new Date()): { weekNumber: number; year: number } {
   const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
@@ -67,7 +96,7 @@ function getMondayOfWeek(weekNumber: number, year: number): Date {
 }
 
 // Server Version Check
-console.log('🚀 [BACKEND LOADED] Backend-Server gestartet - Nov 3, 2025, 14:30 - Mit umfangreichem Debug-Logging');
+console.log('🚀 [BACKEND LOADED] Backend-Server gestartet - März 8, 2026, 21:30 - E-Mail Format Fix: @hort-auma.de');
 
 // Enable logger
 app.use('*', logger(console.log));
@@ -223,9 +252,10 @@ app.post("/make-server-fb86b8a8/signup", async (c) => {
     const supabase = getSupabaseAdmin();
     
     // Create unique email from name (always lowercase)
-    const email = `${firstNameNormalized.toLowerCase()}.${lastNameNormalized.toLowerCase()}@hort-auma.local`;
+    const email = generateEmailFromName(firstNameNormalized, lastNameNormalized);
     
-    console.log(`Registration attempt for: ${firstNameNormalized} ${lastNameNormalized} (email: ${email})`);
+    console.log(`📧 [SIGNUP] Registration attempt for: ${firstNameNormalized} ${lastNameNormalized} (email: ${email})`);
+    console.log(`📧 [SIGNUP] Email format check: ${email} - Valid: ${email.endsWith('@hort-auma.de')}`);
     
     // Check if user already exists
     const existingUsers = await kv.getByPrefix(`user:${firstNameNormalized.toLowerCase()}:${lastNameNormalized.toLowerCase()}`);
@@ -267,12 +297,13 @@ app.post("/make-server-fb86b8a8/signup", async (c) => {
     if (error) {
       console.error('Signup error:', error);
       
+      const errorStr = (error.message || '') + ' ' + (error.code || '');
       // More specific error messages
-      if (error.message.includes('already registered')) {
+      if (errorStr.includes('already registered') || errorStr.includes('user_already_exists') || errorStr.includes('email_exists')) {
         return c.json({ error: 'Ein Konto mit diesem Namen existiert bereits in der Datenbank' }, 400);
       }
       
-      return c.json({ error: error.message }, 400);
+      return c.json({ error: error.message || 'Ein unbekannter Fehler ist aufgetreten' }, 400);
     }
 
     // Store user data in KV
@@ -316,7 +347,7 @@ app.post("/make-server-fb86b8a8/login", async (c) => {
     const lastNameNormalized = lastName.trim();
 
     const supabase = getSupabaseAuth();
-    const email = `${firstNameNormalized.toLowerCase()}.${lastNameNormalized.toLowerCase()}@hort-auma.local`;
+    const email = generateEmailFromName(firstNameNormalized, lastNameNormalized);
 
     console.log(`Login attempt for: ${firstNameNormalized} ${lastNameNormalized} (email: ${email})`);
 
@@ -339,8 +370,10 @@ app.post("/make-server-fb86b8a8/login", async (c) => {
       console.error('❌ Login error:', error);
       console.log(`Failed login for email: ${email}, error code: ${error.status}, message: ${error.message}`);
       
+      const errorStr = (error.message || '') + ' ' + (error.code || '');
+      
       // More specific error messages
-      if (error.message.includes('Invalid login credentials') || error.message.includes('invalid_credentials')) {
+      if (errorStr.includes('Invalid login credentials') || errorStr.includes('invalid_credentials')) {
         console.log('🔍 Invalid credentials detected. Checking user data and attempting repair if needed...');
         
         const adminSupabase = getSupabaseAdmin();
@@ -401,10 +434,12 @@ app.post("/make-server-fb86b8a8/login", async (c) => {
         
         // Case 2: User exists (Create failed), so password was actually wrong
         if (createError) {
-          console.log(`🔐 User exists in Auth. Error type: ${createError.message}`);
+          console.log(`🔐 User exists in Auth. Error type: ${createError.message || createError.code}`);
+          
+          const createErrorStr = (createError.message || '') + ' ' + (createError.code || '');
           
           // Check if it's because user already exists
-          if (createError.message.includes('already registered') || createError.message.includes('already exists')) {
+          if (createErrorStr.includes('already registered') || createErrorStr.includes('already exists') || createErrorStr.includes('email_exists')) {
             console.log('ℹ️ User account exists - password is incorrect');
             return c.json({ 
               error: 'Falsches Passwort. Bitte überprüfen Sie Ihr Passwort oder nutzen Sie "Passwort vergessen".' 
@@ -419,7 +454,7 @@ app.post("/make-server-fb86b8a8/login", async (c) => {
         }
       }
       
-      if (error.message.includes('Email not confirmed')) {
+      if (errorStr.includes('Email not confirmed')) {
         return c.json({ error: 'E-Mail nicht bestätigt' }, 401);
       }
       
@@ -519,7 +554,7 @@ app.post("/make-server-fb86b8a8/reset-password", async (c) => {
       success: true,
       temporaryPassword: tempPassword,
       message: 'Passwort wurde erfolgreich zurückgesetzt',
-      email: `${firstNameNormalized.toLowerCase()}.${lastNameNormalized.toLowerCase()}@hort-auma.local`
+      email: generateEmailFromName(firstNameNormalized, lastNameNormalized)
     });
   } catch (error) {
     console.error('❌ Password reset error:', error);
@@ -1468,15 +1503,22 @@ app.get("/make-server-fb86b8a8/admin/users", async (c) => {
 // Create new user (admin only)
 app.post("/make-server-fb86b8a8/admin/users", async (c) => {
   try {
+    console.log('👤 [ADMIN CREATE USER] Request received');
+    
     const accessToken = c.req.header('Authorization')?.split(' ')[1];
+    console.log('👤 [ADMIN CREATE USER] Access token:', accessToken ? 'Present' : 'Missing');
+    
     const { isAdmin, error } = await verifyAdmin(accessToken);
+    console.log('👤 [ADMIN CREATE USER] Admin verification:', { isAdmin, error });
     
     if (!isAdmin) {
+      console.error('👤 [ADMIN CREATE USER] Authorization failed:', error);
       return c.json({ error: error || 'Nicht autorisiert' }, 403);
     }
 
     const body = await c.req.json();
     const { firstName, lastName, password } = body;
+    console.log('👤 [ADMIN CREATE USER] Data:', { firstName, lastName, passwordLength: password?.length });
 
     if (!firstName || !lastName || !password) {
       return c.json({ error: 'Alle Felder sind erforderlich' }, 400);
@@ -1490,7 +1532,7 @@ app.post("/make-server-fb86b8a8/admin/users", async (c) => {
     const supabase = getSupabaseAdmin();
     
     // Create unique email from name
-    const email = `${firstName.toLowerCase()}.${lastName.toLowerCase()}@hort-auma.local`;
+    const email = generateEmailFromName(firstName, lastName);
     
     // Check if user already exists
     const existingUsers = await kv.getByPrefix(`user:${firstName.toLowerCase()}:${lastName.toLowerCase()}`);
@@ -1521,9 +1563,11 @@ app.post("/make-server-fb86b8a8/admin/users", async (c) => {
     });
 
     if (createError) {
-      console.error('Create user error:', createError);
+      console.error('👤 [ADMIN CREATE USER] Supabase Auth error:', createError);
       return c.json({ error: createError.message }, 400);
     }
+
+    console.log('👤 [ADMIN CREATE USER] User created in Auth:', data.user.id);
 
     // Store user data in KV
     await kv.set(`user:${firstName.toLowerCase()}:${lastName.toLowerCase()}:${data.user.id}`, {
@@ -1537,6 +1581,8 @@ app.post("/make-server-fb86b8a8/admin/users", async (c) => {
       adminPasswordNote: password, // Store password for admin reference
       createdAt: new Date().toISOString()
     });
+
+    console.log('👤 [ADMIN CREATE USER] User stored in KV successfully');
 
     return c.json({ 
       success: true,
@@ -1555,8 +1601,8 @@ app.post("/make-server-fb86b8a8/admin/users", async (c) => {
       }
     });
   } catch (error) {
-    console.error('Create user error:', error);
-    return c.json({ error: 'Ein Fehler ist aufgetreten' }, 500);
+    console.error('👤 [ADMIN CREATE USER] Unexpected error:', error);
+    return c.json({ error: 'Ein Fehler ist aufgetreten: ' + (error instanceof Error ? error.message : String(error)) }, 500);
   }
 });
 
@@ -3066,7 +3112,7 @@ Deno.serve(async (req, info) => {
     // Suppress "Http: connection closed" errors which happen when client disconnects
     if (
       error instanceof Error && 
-      (error.name === 'Http' || error.message.includes('connection closed'))
+      (error.name === 'Http' || (error.message && error.message.includes('connection closed')))
     ) {
       console.log('Info: Connection closed by client');
       return new Response(null, { status: 499 });

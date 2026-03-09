@@ -59,13 +59,15 @@ interface HortnerDashboardProps {
   allHortzettel: (HortzettelData & { id: string; createdAt: Date })[];
   onLogout: () => void;
   onToggleDesign?: (useModern: boolean) => void;
+  schoolPhotoUrl?: string;
 }
 
 export default function HortnerDashboard({ 
   klasse, 
   allHortzettel: initialHortzettel, 
   onLogout,
-  onToggleDesign
+  onToggleDesign,
+  schoolPhotoUrl
 }: HortnerDashboardProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [klassenFilter, setKlassenFilter] = useState("alle");
@@ -557,7 +559,7 @@ export default function HortnerDashboard({
         <div className="absolute inset-0">
           <div 
             className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: `url(${schoolImage})` }}
+            style={{ backgroundImage: `url(${schoolPhotoUrl || schoolImage})` }}
           />
           <div className="absolute inset-0 bg-gradient-to-r from-blue-500/95 via-indigo-500/90 to-purple-500/95 dark:from-slate-900/95 dark:via-slate-800/90 dark:to-slate-900/95 backdrop-blur-sm transition-colors" />
         </div>

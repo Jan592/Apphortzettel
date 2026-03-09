@@ -638,7 +638,7 @@ function AppContent() {
 
   // Splash Screen
   if (showSplash) {
-    return <SplashScreen onComplete={() => setShowSplash(false)} schoolName={schoolName} appTitle={appContent.appTitle} />;
+    return <SplashScreen onComplete={() => setShowSplash(false)} schoolName={schoolName} appTitle={appContent.appTitle} schoolPhotoUrl={appContent.schoolPhotoUrl} />;
   }
 
   // Loading state
@@ -729,6 +729,7 @@ function AppContent() {
           allHortzettel={hortzettelList}
           onLogout={handleHortnerLogout}
           onToggleDesign={handleToggleHortnerDesign}
+          schoolPhotoUrl={appContent?.schoolPhotoUrl}
         />
         <Toaster />
       </>
@@ -747,7 +748,7 @@ function AppContent() {
           >
             ← Zurück zur Anmeldung
           </Button>
-          <HortnerLogin onLogin={handleHortnerLogin} />
+          <HortnerLogin onLogin={handleHortnerLogin} schoolPhotoUrl={appContent?.schoolPhotoUrl} />
         </div>
         <Toaster />
       </div>
@@ -771,6 +772,7 @@ function AppContent() {
             schoolName={schoolName}
             content={appContent}
             onToggleDesign={handleToggleDesign}
+            schoolPhotoUrl={appContent?.schoolPhotoUrl}
           />
         ) : (
           <PersonalDashboard
@@ -784,6 +786,7 @@ function AppContent() {
             hortzettelList={hortzettelList}
             onCreateFromTemplate={handleCreateFromTemplate}
             onToggleDesign={handleToggleDesign}
+            schoolPhotoUrl={appContent?.schoolPhotoUrl}
           />
         )}
         <Toaster />
@@ -837,7 +840,7 @@ function AppContent() {
   }
 
   // Login/Register View
-  const schoolImage = "https://images.unsplash.com/photo-1665270695165-93b5798522ad?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxnZXJtYW4lMjBlbGVtZW50YXJ5JTIwc2Nob29sJTIwYnVpbGRpbmd8ZW58MXx8fHwxNzYxNjkwNjQyfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral";
+  const schoolImage = appContent.schoolPhotoUrl || "https://images.unsplash.com/photo-1665270695165-93b5798522ad?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxnZXJtYW4lMjBlbGVtZW50YXJ5JTIwc2Nob29sJTIwYnVpbGRpbmd8ZW58MXx8fHwxNzYxNjkwNjQyfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral";
 
   return (
     <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-3 transition-colors">
@@ -847,7 +850,7 @@ function AppContent() {
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${schoolImage})` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-600/95 via-purple-600/90 to-pink-600/95 dark:from-slate-900/95 dark:via-slate-800/90 dark:to-slate-900/95 backdrop-blur-sm transition-colors" />
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-400/80 via-indigo-400/75 to-purple-400/80 dark:from-slate-800/90 dark:via-slate-700/85 dark:to-slate-800/90 backdrop-blur-md transition-colors" />
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDE0YzMuMzEgMCA2IDIuNjkgNiA2cy0yLjY5IDYtNiA2LTYtMi42OS02LTYgMi42OS02IDYtNiIvPjwvZz48L2c+PC9zdmc+')] opacity-40"></div>
       </div>
 
