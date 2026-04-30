@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PNG Icons Generator - Hortzettel App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #3B82F6;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        button {
+            background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px 5px;
+            font-weight: bold;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        .preview {
+            margin: 20px 0;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .icon-preview {
+            text-align: center;
+        }
+        .icon-preview img {
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            margin-bottom: 5px;
+        }
+        .icon-preview p {
+            margin: 5px 0;
+            font-size: 12px;
+            color: #666;
+        }
+        .success {
+            background: #10B981;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: none;
+        }
+        .instructions {
+            background: #FEF3C7;
+            border-left: 4px solid #F59E0B;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .instructions h3 {
+            margin-top: 0;
+            color: #92400E;
+        }
+        .instructions ol {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .instructions li {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 PNG Icons Generator</h1>
+        <p class="subtitle">Erstellen Sie PNG-Icons für Ihre Hortzettel PWA</p>
+
+        <div class="instructions">
+            <h3>📋 Anleitung:</h3>
+            <ol>
+                <li>Klicken Sie auf "Icons generieren und anzeigen"</li>
+                <li>Rechtsklick auf jedes Icon → "Bild speichern unter..."</li>
+                <li>Speichern Sie mit dem richtigen Namen (siehe unter dem Icon)</li>
+                <li>Laden Sie alle 3 Dateien in den <code>/public</code> Ordner hoch</li>
+            </ol>
+        </div>
+
+        <button onclick="generateIcons()">🎨 Icons generieren und anzeigen</button>
+        <button onclick="downloadAll()">💾 Alle herunterladen (automatisch)</button>
+
+        <div id="success" class="success">
+            ✅ Icons erfolgreich generiert! Rechtsklick → "Bild speichern unter..."
+        </div>
+
+        <div id="preview" class="preview"></div>
+    </div>
+
+    <script>
+        function roundRect(ctx, x, y, width, height, radius) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+        }
+
+        function createIcon(size, maskable = false) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+
+            // Gradient background
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, '#3B82F6');
+            gradient.addColorStop(0.5, '#8B5CF6');
+            gradient.addColorStop(1, '#F59E0B');
+
+            // Draw rounded rectangle
+            const radius = size * 0.225;
+            ctx.fillStyle = gradient;
+            roundRect(ctx, 0, 0, size, size, radius);
+            ctx.fill();
+
+            // Calculate content area (with padding for maskable)
+            const padding = maskable ? size * 0.1 : 0;
+            const scale = (size - padding * 2) / size;
+            const centerX = size / 2;
+            const centerY = size / 2;
+
+            ctx.save();
+            if (maskable) {
+                ctx.translate(centerX, centerY);
+                ctx.scale(scale, scale);
+                ctx.translate(-centerX, -centerY);
+            }
+
+            const s = size / 512; // Base scale
+
+            // Draw graduation cap (simplified)
+            ctx.fillStyle = '#FCD34D';
+            ctx.strokeStyle = '#FFFFFF';
+            ctx.lineWidth = 4 * s;
+
+            // Cap top
+            ctx.beginPath();
+            ctx.moveTo(centerX - 100 * s, centerY - 60 * s);
+            ctx.lineTo(centerX, centerY - 100 * s);
+            ctx.lineTo(centerX + 100 * s, centerY - 60 * s);
+            ctx.lineTo(centerX, centerY - 20 * s);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            // Paper/Document
+            ctx.fillStyle = '#FFFFFF';
+            const paperWidth = 140 * s;
+            const paperHeight = 100 * s;
+            const paperX = centerX - paperWidth / 2;
+            const paperY = centerY + 20 * s;
+            
+            ctx.beginPath();
+            roundRect(ctx, paperX, paperY, paperWidth, paperHeight, 8 * s);
+            ctx.fill();
+
+            // Lines on paper
+            ctx.strokeStyle = '#3B82F6';
+            ctx.lineWidth = 3 * s;
+            ctx.beginPath();
+            ctx.moveTo(centerX - 50 * s, centerY + 45 * s);
+            ctx.lineTo(centerX + 50 * s, centerY + 45 * s);
+            ctx.stroke();
+
+            ctx.strokeStyle = '#8B5CF6';
+            ctx.beginPath();
+            ctx.moveTo(centerX - 50 * s, centerY + 65 * s);
+            ctx.lineTo(centerX + 50 * s, centerY + 65 * s);
+            ctx.stroke();
+
+            ctx.strokeStyle = '#F59E0B';
+            ctx.lineWidth = 3 * s;
+            ctx.beginPath();
+            ctx.moveTo(centerX - 50 * s, centerY + 85 * s);
+            ctx.lineTo(centerX + 30 * s, centerY + 85 * s);
+            ctx.stroke();
+
+            // Letter "A"
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = `bold ${80 * s}px Arial, sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'alphabetic';
+            ctx.fillText('A', centerX, size - 40 * s);
+
+            ctx.restore();
+
+            return canvas.toDataURL('image/png');
+        }
+
+        let generatedIcons = {};
+
+        function generateIcons() {
+            const preview = document.getElementById('preview');
+            preview.innerHTML = '';
+
+            const icons = [
+                { size: 192, name: 'app-icon-192.png', maskable: false },
+                { size: 512, name: 'app-icon-512.png', maskable: false },
+                { size: 512, name: 'app-icon-maskable.png', maskable: true }
+            ];
+
+            icons.forEach(({ size, name, maskable }) => {
+                const dataUrl = createIcon(size, maskable);
+                generatedIcons[name] = dataUrl;
+
+                const div = document.createElement('div');
+                div.className = 'icon-preview';
+                
+                const img = document.createElement('img');
+                img.src = dataUrl;
+                img.width = 150;
+                img.alt = name;
+                
+                const p1 = document.createElement('p');
+                p1.innerHTML = `<strong>${name}</strong>`;
+                
+                const p2 = document.createElement('p');
+                p2.textContent = `${size}×${size}px${maskable ? ' (Safe Zone)' : ''}`;
+
+                div.appendChild(img);
+                div.appendChild(p1);
+                div.appendChild(p2);
+                preview.appendChild(div);
+            });
+
+            document.getElementById('success').style.display = 'block';
+        }
+
+        function downloadAll() {
+            if (Object.keys(generatedIcons).length === 0) {
+                generateIcons();
+            }
+
+            setTimeout(() => {
+                Object.entries(generatedIcons).forEach(([name, dataUrl]) => {
+                    const link = document.createElement('a');
+                    link.download = name;
+                    link.href = dataUrl;
+                    link.click();
+                });
+                alert('✅ Alle 3 Icons wurden heruntergeladen!\n\nLaden Sie sie jetzt in den /public Ordner hoch.');
+            }, 100);
+        }
+
+        // Auto-generate on load
+        window.addEventListener('load', () => {
+            setTimeout(generateIcons, 500);
+        });
+    </script>
+</body>
+</html>
